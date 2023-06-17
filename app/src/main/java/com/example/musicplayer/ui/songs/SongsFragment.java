@@ -14,8 +14,6 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -44,14 +42,9 @@ import com.example.musicplayer.adapters.SongAdapter;
 import com.example.musicplayer.adapters.SongChanged;
 import com.example.musicplayer.database.DataLoader;
 import com.example.musicplayer.database.Songs;
-import com.example.musicplayer.nowplaying.NowPlaying;
-import com.example.musicplayer.ui.folders.FoldersFragment;
 import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller;
-
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Random;
-
 import static android.app.Activity.RESULT_OK;
 import static com.example.musicplayer.MainActivity.UNIQUE_REQUEST_CODE;
 import static com.example.musicplayer.MainActivity.index;
@@ -73,11 +66,9 @@ public class SongsFragment extends Fragment implements ItemClicked, PlaylistItem
 
     private SharedPreferences sort;
     private StorageUtil storage;
-    private Menu menu;
     private Context context;
 
     private ActionMode actionMode;
-    private final ActionModeCallback actionModeCallback = new ActionModeCallback();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -209,7 +200,6 @@ public class SongsFragment extends Fragment implements ItemClicked, PlaylistItem
 
     @Override
     public void onItemLongClicked(int index) {
-        if (actionMode == null) actionMode = ((AppCompatActivity)getActivity()).startSupportActionMode(actionModeCallback);
         toggleSelection(index);
     }
 
@@ -296,110 +286,6 @@ public class SongsFragment extends Fragment implements ItemClicked, PlaylistItem
 
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        try {
-
-            switch (item.getTitle().toString()) {
-
-
-
-                case "Play All":
-                    DataLoader.playAudio(0,mySongs, storage, context);
-                    break;
-
-                case "Shuffle All":
-                    DataLoader.playAudio(new Random().nextInt(mySongs.size()), mySongs, storage, context);
-                    NowPlaying.shuffle = true;
-                    break;
-
-                case "Save Now Playing":
-                    DataLoader.addToPlaylist(MediaPlayerService.audioList, context, SongsFragment.this);
-                    break;
-
-
-
-                case "Title":
-                    menu.getItem(3).getSubMenu().getItem(sort.getInt("SongIndex", 0)).setChecked(false);
-                    if (!item.isChecked()) {
-                        item.setChecked(true);
-                        sort.edit().putInt("SongIndex",0).putString("SongSortOrder", MediaStore.Audio.Media.DEFAULT_SORT_ORDER).apply();
-                        songsViewModel.refresh();
-                        fastScroller.setPopupDrawable(getResources().getDrawable(R.drawable.fsp));
-                    }
-                    break;
-
-                case "Album":
-                    menu.getItem(3).getSubMenu().getItem(sort.getInt("SongIndex", 0)).setChecked(false);
-                    if (!item.isChecked()) {
-                        item.setChecked(true);
-                        sort.edit().putInt("SongIndex",1).putString("SongSortOrder", "album").apply();
-                        songsViewModel.refresh();
-                        fastScroller.setPopupDrawable(null);
-                    }
-                    break;
-
-                case "Artist":
-                    menu.getItem(3).getSubMenu().getItem(sort.getInt("SongIndex", 0)).setChecked(false);
-                    if (!item.isChecked()) {
-                        item.setChecked(true);
-                        sort.edit().putInt("SongIndex",2).putString("SongSortOrder", "artist").apply();
-                        songsViewModel.refresh();
-                        fastScroller.setPopupDrawable(null);
-                    }
-                    break;
-
-                case "Duration":
-                    menu.getItem(3).getSubMenu().getItem(sort.getInt("SongIndex", 0)).setChecked(false);
-                    if (!item.isChecked()) {
-                        item.setChecked(true);
-                        sort.edit().putInt("SongIndex",3).putString("SongSortOrder", "duration").apply();
-                        songsViewModel.refresh();
-                        fastScroller.setPopupDrawable(null);
-                    }
-                    break;
-
-                case "Year":
-                    menu.getItem(3).getSubMenu().getItem(sort.getInt("SongIndex", 0)).setChecked(false);
-                    if (!item.isChecked()) {
-                        item.setChecked(true);
-                        sort.edit().putInt("SongIndex",4).putString("SongSortOrder", "year").apply();
-                        songsViewModel.refresh();
-                        fastScroller.setPopupDrawable(null);
-                    }
-                    break;
-
-                case "Date added":
-                    menu.getItem(3).getSubMenu().getItem(sort.getInt("SongIndex", 0)).setChecked(false);
-                    if (!item.isChecked()) {
-                        item.setChecked(true);
-                        sort.edit().putInt("SongIndex",5).putString("SongSortOrder", "date_added").apply();
-                        songsViewModel.refresh();
-                        fastScroller.setPopupDrawable(null);
-                    }
-                    break;
-
-                case "Reverse order":
-                    if (!item.isChecked()) {
-                        item.setChecked(true);
-                        sort.edit().putBoolean("SongReverse", true).apply();
-                    }
-                    else {
-                        item.setChecked(false);
-                        sort.edit().putBoolean("SongReverse", false).apply();
-                    }
-                    songsViewModel.refresh();
-                    break;
-
-                default:
-                    return super.onOptionsItemSelected(item);
-            }
-        } catch (Exception e) {
-            return super.onOptionsItemSelected(item);
-        }
-
-        return true;
-    }
 
 
 
@@ -410,82 +296,6 @@ public class SongsFragment extends Fragment implements ItemClicked, PlaylistItem
     }
 
 
-    private class ActionModeCallback implements ActionMode.Callback {
-
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-
-            ArrayList<Integer> indices = (ArrayList<Integer>) myAdapter.getSelectedItems();
-            ArrayList<Songs> songs = new ArrayList<>();
-
-            for (int i=0; i<indices.size(); i++){
-                songs.add(mySongs.get(indices.get(i)));
-            }
-
-            switch (item.getTitle().toString()) {
-
-                case "Play":
-                    DataLoader.playAudio(0, songs, storage, context);
-                    mode.finish();
-                    return true;
-
-                case "Enqueue":
-                    if (MediaPlayerService.audioList != null) MediaPlayerService.audioList.addAll(songs);
-                    else MediaPlayerService.audioList = songs;
-                    storage.storeAudio(MediaPlayerService.audioList);
-                    if (songs.size()>1) Toast.makeText(context, songs.size() + " songs have been added to the queue!", Toast.LENGTH_SHORT).show();
-                    else Toast.makeText(context, "1 song has been added to the queue!", Toast.LENGTH_SHORT).show();
-                    mode.finish();
-                    return true;
-
-                case "Play next":
-                    if (MediaPlayerService.audioList != null) MediaPlayerService.audioList.addAll(MediaPlayerService.audioIndex+1, songs);
-                    else MediaPlayerService.audioList = songs;
-                    storage.storeAudio(MediaPlayerService.audioList);
-                    if (songs.size()>1) Toast.makeText(context, songs.size() + " songs have been added to the queue!", Toast.LENGTH_SHORT).show();
-                    else Toast.makeText(context, "1 song has been added to the queue!", Toast.LENGTH_SHORT).show();
-                    mode.finish();
-                    return true;
-
-                case "Shuffle":
-                    DataLoader.playAudio(0, songs, storage, context);
-                    NowPlaying.shuffle = true;
-                    mode.finish();
-                    return true;
-
-                case "Add to playlist":
-                    DataLoader.addToPlaylist(songs, context, SongsFragment.this);
-                    mode.finish();
-                    return true;
-
-                case "Delete":
-                    deleteSongs(songs, context);
-                    myAdapter.notifyDataSetChanged();
-                    mode.finish();
-                    return true;
-
-
-                default:
-                    return false;
-            }
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            myAdapter.clearSelection();
-            actionMode = null;
-        }
-    }
 
 
     private void toggleSelection(int position) {
@@ -651,7 +461,6 @@ public class SongsFragment extends Fragment implements ItemClicked, PlaylistItem
         fastScroller = null;
         sort = null;
         storage = null;
-        menu = null;
         context = null;
         actionMode = null;
 

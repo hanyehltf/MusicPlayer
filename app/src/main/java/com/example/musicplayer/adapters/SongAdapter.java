@@ -1,43 +1,31 @@
 package com.example.musicplayer.adapters;
 
-import android.app.Dialog;
 import android.content.ContentUris;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.musicplayer.MainActivity;
 import com.example.musicplayer.MediaPlayerService;
 import com.example.musicplayer.R;
 import com.example.musicplayer.StorageUtil;
 import com.example.musicplayer.database.DataLoader;
 import com.example.musicplayer.database.Songs;
 import com.example.musicplayer.nowplaying.NowPlaying;
-import com.example.musicplayer.ui.EditTags;
 import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.util.ArrayList;
 
 public class SongAdapter extends SelectableAdapter<SongAdapter.ViewHolder> implements RecyclerViewFastScroller.OnPopupTextUpdate {
@@ -48,8 +36,7 @@ public class SongAdapter extends SelectableAdapter<SongAdapter.ViewHolder> imple
     private final Context context;
     private final StorageUtil storage;
     private final Fragment fragment;
-    private Toast toast;
-
+private DataLoader dataLoader;
 
     public SongAdapter(Context context, Fragment fragment, ArrayList<Songs> songsArrayList){
 
@@ -58,6 +45,7 @@ public class SongAdapter extends SelectableAdapter<SongAdapter.ViewHolder> imple
         activity = (ItemClicked) fragment;
         this.fragment = fragment;
         storage = new StorageUtil(context);
+        dataLoader=new DataLoader();
 
     }
 
@@ -91,7 +79,8 @@ public class SongAdapter extends SelectableAdapter<SongAdapter.ViewHolder> imple
 
 
         private final TextView tv_song_name, tv_artist_name, tv_song_duration;
-        private final ImageView iv_album_art;
+        private final ImageView iv_album_art,song_add_to_playlist;
+
 
 
         public ViewHolder(@NonNull View itemView) {
@@ -102,7 +91,7 @@ public class SongAdapter extends SelectableAdapter<SongAdapter.ViewHolder> imple
             tv_artist_name = itemView.findViewById(R.id.tv_artist_name);
             tv_song_duration = itemView.findViewById(R.id.tv_song_duration);
             iv_album_art = itemView.findViewById(R.id.iv_album_art);
-
+            song_add_to_playlist=itemView.findViewById(R.id.song_add_to_playlist);
 
            itemView.setOnClickListener(this);
            itemView.setOnLongClickListener(this);
@@ -114,6 +103,7 @@ public class SongAdapter extends SelectableAdapter<SongAdapter.ViewHolder> imple
         public void onClick(View v) {
 
             activity.onItemClicked(getAdapterPosition());
+
             notifyDataSetChanged();
         }
 
@@ -174,7 +164,15 @@ public class SongAdapter extends SelectableAdapter<SongAdapter.ViewHolder> imple
             }
         }.run();
 
+holder.song_add_to_playlist.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
 
+
+        DataLoader.addToPlaylist(songs.get(position),context,fragment);
+
+    }
+});
 
     }
 
@@ -197,42 +195,8 @@ public class SongAdapter extends SelectableAdapter<SongAdapter.ViewHolder> imple
     }
 
 
-    private void deleteSongs(final int position){
-
-        final Dialog dialog = new Dialog(context);
-
-        dialog.setContentView(R.layout.delete_song_layout);
-
-        TextView delete = dialog.findViewById(R.id.tv_delete);
-
-        delete.setText("Are you sure you want to delete " + songs.get(position).getTitle() + "?");
-
-        dialog.show();
-
-        dialog.findViewById(R.id.delete_cancel).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                dialog.dismiss();
-
-            }
-        });
-
-        dialog.findViewById(R.id.delete_delete).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                dialog.dismiss();
-                context.getContentResolver().delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, "_id =? ", new String[]{songs.get(position).getId() + ""});
-                new File(songs.get(position).getData()).delete();
-                songs.remove(position);
-                notifyDataSetChanged();
-            }
-        });
 
 
-
-    }
 
 
 }

@@ -81,7 +81,6 @@ public class FoldersFragment extends Fragment implements ItemClicked, FolderItem
     RecyclerViewFastScroller fastScroller;
 
     private ActionMode actionMode;
-    private final FoldersFragment.ActionModeCallback actionModeCallback = new FoldersFragment.ActionModeCallback();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -293,7 +292,6 @@ public class FoldersFragment extends Fragment implements ItemClicked, FolderItem
 
     @Override
     public void onItemLongClicked(int index) {
-        if (actionMode == null) actionMode = ((AppCompatActivity)getActivity()).startSupportActionMode(actionModeCallback);
         toggleSelection(index);
     }
 
@@ -350,12 +348,10 @@ public class FoldersFragment extends Fragment implements ItemClicked, FolderItem
 
         if (index != 0 && !currentPath.equals("/")) {
             if (actionMode == null)
-                actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(actionModeCallback);
             toggleSelection(index);
         }
         else if (currentPath.equals("/")){
             if (actionMode == null)
-                actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(actionModeCallback);
             toggleSelection(index);
         }
 
@@ -497,91 +493,6 @@ public class FoldersFragment extends Fragment implements ItemClicked, FolderItem
         myAdapter.notifyDataSetChanged();
     }
 
-    private class ActionModeCallback implements ActionMode.Callback {
-
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-
-            ArrayList<Integer> indices = (ArrayList<Integer>) myAdapter.getSelectedItems();
-            ArrayList<Songs> songs = new ArrayList<>();
-
-            if (!FoldersFragment.currentPath.equals("/")) {
-                for (int i = 0; i < indices.size(); i++) {
-
-                    if (indices.get(i) <= list.size()) {
-                        songs.addAll(myAdapter.loadFolderAudio(FoldersFragment.currentPath + list.get(indices.get(i)-1) + "/"));
-                    } else {
-                        songs.add(mySongs.get(indices.get(i) - list.size() - 1));
-                    }
-
-                }
-            }
-            else songs.addAll(myAdapter.loadFolderAudio("/"));
-
-            switch (item.getTitle().toString()) {
-
-                case "Play":
-                    DataLoader.playAudio(0, songs, storage, context);
-                    mode.finish();
-                    return true;
-
-                case "Enqueue":
-                    if (MediaPlayerService.audioList != null) MediaPlayerService.audioList.addAll(songs);
-                    else MediaPlayerService.audioList = songs;
-                    storage.storeAudio(MediaPlayerService.audioList);
-                    if (songs.size()>1) Toast.makeText(context, songs.size() + " songs have been added to the queue!", Toast.LENGTH_SHORT).show();
-                    else Toast.makeText(context, "1 song has been added to the queue!", Toast.LENGTH_SHORT).show();
-                    mode.finish();
-                    return true;
-
-                case "Play next":
-                    if (MediaPlayerService.audioList != null) MediaPlayerService.audioList.addAll(MediaPlayerService.audioIndex+1, songs);
-                    else MediaPlayerService.audioList = songs;
-                    storage.storeAudio(MediaPlayerService.audioList);
-                    if (songs.size()>1) Toast.makeText(context, songs.size() + " songs have been added to the queue!", Toast.LENGTH_SHORT).show();
-                    else Toast.makeText(context, "1 song has been added to the queue!", Toast.LENGTH_SHORT).show();
-                    mode.finish();
-                    return true;
-
-                case "Shuffle":
-                    DataLoader.playAudio(0, songs, storage, context);
-                    NowPlaying.shuffle = true;
-                    mode.finish();
-                    return true;
-
-                case "Add to playlist":
-                    DataLoader.addToPlaylist(songs, context, FoldersFragment.this);
-                    mode.finish();
-                    return true;
-
-                case "Delete":
-                    SongsFragment.deleteSongs(songs, context);
-                    myAdapter.notifyDataSetChanged();
-                    mode.finish();
-                    return true;
-
-
-                default:
-                    return false;
-            }
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            myAdapter.clearSelection();
-            actionMode = null;
-        }
-    }
 
 
     private void toggleSelection(int position) {

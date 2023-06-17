@@ -19,9 +19,6 @@
         android:roundIcon="@mipmap/cassette_round"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.EditTags"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
-        <activity
             android:name=".nowplaying.NowPlaying"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />

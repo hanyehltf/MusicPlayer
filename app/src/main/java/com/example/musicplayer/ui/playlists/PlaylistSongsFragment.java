@@ -75,7 +75,6 @@ public class PlaylistSongsFragment extends Fragment  implements ItemClicked, Pla
     private TextView playlist_num_songs;
 
     private ActionMode actionMode;
-    private final ActionModeCallback actionModeCallback = new ActionModeCallback();
 
 
     private final ItemTouchHelper.Callback itemCallback = new ItemTouchHelper.Callback() {
@@ -340,7 +339,6 @@ public class PlaylistSongsFragment extends Fragment  implements ItemClicked, Pla
 
     @Override
     public void onItemLongClicked(int index) {
-        if (actionMode == null) actionMode = ((AppCompatActivity)getActivity()).startSupportActionMode(actionModeCallback);
         toggleSelection(index);
     }
 
@@ -444,128 +442,14 @@ public class PlaylistSongsFragment extends Fragment  implements ItemClicked, Pla
 
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        try {
-
-            switch (item.getTitle().toString()) {
 
 
-
-                case "Play All":
-                    DataLoader.playAudio(0, playlistSongs, storage, context);
-                    break;
-
-                case "Shuffle All":
-                    DataLoader.playAudio(new Random().nextInt(playlistSongs.size()), playlistSongs, storage, context);
-                    NowPlaying.shuffle = true;
-                    break;
-
-                case "Save Now Playing":
-                    DataLoader.addToPlaylist(MediaPlayerService.audioList, context, PlaylistSongsFragment.this);
-                    break;
-
-
-
-
-                default:
-                    return super.onOptionsItemSelected(item);
-            }
-        } catch (Exception e) {
-            return super.onOptionsItemSelected(item);
-        }
-
-        return true;
-    }
-
-
-    @Override
-    public void onPrepareOptionsMenu(@NonNull Menu menu) {
-
-
-    }
 
     @Override
     public void onSongChanged() {
         queueAdapter.notifyDataSetChanged();
     }
 
-    private class ActionModeCallback implements ActionMode.Callback {
-
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-
-            ArrayList<Integer> indices = (ArrayList<Integer>) queueAdapter.getSelectedItems();
-            ArrayList<Songs> songs = new ArrayList<>();
-
-            for (int i=0; i<indices.size(); i++){
-                songs.add(playlistSongs.get(indices.get(i)));
-            }
-
-            switch (item.getTitle().toString()) {
-
-                case "Play":
-                    DataLoader.playAudio(0, songs, storage, context);
-                    mode.finish();
-                    return true;
-
-                case "Enqueue":
-                    if (MediaPlayerService.audioList != null) MediaPlayerService.audioList.addAll(songs);
-                    else MediaPlayerService.audioList = songs;
-                    storage.storeAudio(MediaPlayerService.audioList);
-                    if (songs.size()>1) Toast.makeText(context, songs.size() + " songs have been added to the queue!", Toast.LENGTH_SHORT).show();
-                    else Toast.makeText(context, "1 song has been added to the queue!", Toast.LENGTH_SHORT).show();
-                    mode.finish();
-                    return true;
-
-                case "Play next":
-                    if (MediaPlayerService.audioList != null) MediaPlayerService.audioList.addAll(MediaPlayerService.audioIndex+1, songs);
-                    else MediaPlayerService.audioList = songs;
-                    storage.storeAudio(MediaPlayerService.audioList);
-                    if (songs.size()>1) Toast.makeText(context, songs.size() + " songs have been added to the queue!", Toast.LENGTH_SHORT).show();
-                    else Toast.makeText(context, "1 song has been added to the queue!", Toast.LENGTH_SHORT).show();
-                    mode.finish();
-                    return true;
-
-                case "Shuffle":
-                    DataLoader.playAudio(0, songs, storage, context);
-                    NowPlaying.shuffle = true;
-                    mode.finish();
-                    return true;
-
-                case "Add to playlist":
-                    DataLoader.addToPlaylist(songs, context, PlaylistSongsFragment.this);
-                    mode.finish();
-                    return true;
-
-                case "Delete":
-                    SongsFragment.deleteSongs(songs, context);
-                    queueAdapter.notifyDataSetChanged();
-                    mode.finish();
-                    return true;
-
-
-                default:
-                    return false;
-            }
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            queueAdapter.clearSelection();
-            actionMode = null;
-        }
-    }
 
 
     private void toggleSelection(int position) {

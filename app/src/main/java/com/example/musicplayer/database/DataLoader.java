@@ -23,25 +23,14 @@ import com.example.musicplayer.MainActivity;
 import com.example.musicplayer.MediaPlayerService;
 import com.example.musicplayer.R;
 import com.example.musicplayer.StorageUtil;
-import com.example.musicplayer.adapters.AddToPlaylistAdapter;
 import com.example.musicplayer.nowplaying.NowPlaying;
-import com.example.musicplayer.ui.playlists.PlaylistsViewModel;
 import com.example.musicplayer.ui.songs.SongsFragment;
 
 import java.util.ArrayList;
 
 public class DataLoader {
 
-//    Common functions such as loading audio, playing audio etc which are used multiple times are placed in this class.
 
-    /**
-     * Used to play a specific audio file from a list of songs.
-     *
-     * @param audioIndex - the index of the song in the list
-     * @param songs - the list of songs
-     * @param storage - the storageutil file to store the audio index
-     * @param context - the context of the activity/fragment where it is called
-     * **/
     public static void playAudio(int audioIndex, ArrayList<Songs> songs, StorageUtil storage, final Context context) {
         //Check is service is active
 
@@ -78,15 +67,7 @@ public class DataLoader {
 
     }
 
-    /**
-     *Used to load audio files into a list of songs from an album/artist/playlist
-     *
-     * @param id_ - The id of the album/artist/playlist to be loaded
-     * @param type - 1 for album, 2 for artist, 3 for playlist
-     * @param context - the context of the activity/fragment where it is called
-     * @param sort  - the sharedpreferences file containing the sort order
-     * @return - an Arraylist of songs from the album/artist/playlist
-     * */
+
 
     public static ArrayList<Songs> loadAudio(long id_, int type, Context context, SharedPreferences sort)
     {
@@ -151,16 +132,9 @@ public class DataLoader {
     }
 
 
-    /**
-     *
-     * Used to add a list of songs to a playlist
-     *
-     * @param songs - the list of songs to be added to the playlist
-     * @param context - the context of the activity/fragment where it is called
-     * @param fragment - the fragment where it is called
-     * */
 
-    public static void addToPlaylist(final ArrayList<Songs> songs, final Context context, final Fragment fragment){
+
+    public static void addToPlaylist(final Songs song, final Context context, final Fragment fragment){
 
         final Dialog dialog  = new Dialog(context);
 
@@ -288,15 +262,15 @@ public class DataLoader {
                         }
 
 
-                        for (int i = 0; i<songs.size(); i++) {
+
 
                             contentValue.clear();
-                            contentValue.put("audio_id", songs.get(i).getId());
+                            contentValue.put("audio_id", song.getId());
                             contentValue.put("play_order", playOrder);
 
                             contentResolver.insert(songUri, contentValue);
                             playOrder++;
-                        }
+
                         handler.removeCallbacks(runnable);
                         newPlaylist.dismiss();
 
@@ -315,15 +289,7 @@ public class DataLoader {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
-        new Runnable() {
-            @Override
-            public void run() {
 
-                if (fragment != null) recyclerView.setAdapter(new AddToPlaylistAdapter(fragment, dialog, PlaylistsViewModel.loadPlaylists(context),songs));
-                else recyclerView.setAdapter(new AddToPlaylistAdapter(context, dialog, PlaylistsViewModel.loadPlaylists(context),songs));
-
-            }
-        }.run();
 
         dialog.show();
 

@@ -242,47 +242,7 @@ public class PlaylistsFragment extends Fragment implements ItemClicked, Playlist
     }
 
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        try {
 
-            switch (item.getTitle().toString()) {
-
-
-
-                case "Play All":
-                    ArrayList<Songs> songs = new ArrayList<>();
-                    for (int i = 0; i<myPlaylists.size(); i++){
-                        songs.addAll(DataLoader.loadAudio(myPlaylists.get(i).getId(), 3, context, null));
-
-                    }
-                    DataLoader.playAudio(0, songs, storage, context);
-                    break;
-
-                case "Shuffle All":
-                    ArrayList<Songs> shuffleSongs = new ArrayList<>();
-                    for (int i = 0; i<myPlaylists.size(); i++){
-                        shuffleSongs.addAll(DataLoader.loadAudio(myPlaylists.get(i).getId(), 3, context, null));
-
-                    }
-                    DataLoader.playAudio(new Random().nextInt(shuffleSongs.size()), shuffleSongs, storage, context);
-                    NowPlaying.shuffle = true;
-                    break;
-
-                case "Save Now Playing":
-                    DataLoader.addToPlaylist(MediaPlayerService.audioList, context, PlaylistsFragment.this);
-                    break;
-
-
-                default:
-                    return super.onOptionsItemSelected(item);
-            }
-        } catch (Exception e) {
-            return super.onOptionsItemSelected(item);
-        }
-
-        return true;
-    }
 
     @Override
     public void onDestroyView() {

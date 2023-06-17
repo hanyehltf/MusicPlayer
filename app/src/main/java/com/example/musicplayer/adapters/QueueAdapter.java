@@ -1,55 +1,30 @@
 package com.example.musicplayer.adapters;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Dialog;
-import android.content.ContentResolver;
-import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Handler;
 import android.provider.MediaStore;
-import android.provider.Settings;
-import android.support.v4.media.session.MediaControllerCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.musicplayer.MainActivity;
 import com.example.musicplayer.MediaPlayerService;
 import com.example.musicplayer.R;
 import com.example.musicplayer.StorageUtil;
-import com.example.musicplayer.database.DataLoader;
 import com.example.musicplayer.database.Songs;
 import com.example.musicplayer.nowplaying.NowPlaying;
-import com.example.musicplayer.ui.EditTags;
-import com.example.musicplayer.ui.playlists.PlaylistsViewModel;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 public class QueueAdapter extends SelectableAdapter<QueueAdapter.ViewHolder> {
@@ -57,7 +32,6 @@ public class QueueAdapter extends SelectableAdapter<QueueAdapter.ViewHolder> {
     private final List<Songs> songs;
     private final ItemClicked activity;
     private final Context context;
-    private Toast toast;
     private final StorageUtil storage;
     private final Fragment fragment;
     private final ItemTouchHelper itemTouchHelper;

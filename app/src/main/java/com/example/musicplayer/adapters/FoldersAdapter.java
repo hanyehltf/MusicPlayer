@@ -4,39 +4,28 @@ import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.collection.ArrayMap;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.musicplayer.MainActivity;
 import com.example.musicplayer.MediaPlayerService;
 import com.example.musicplayer.R;
 import com.example.musicplayer.StorageUtil;
-import com.example.musicplayer.database.DataLoader;
 import com.example.musicplayer.database.Songs;
 import com.example.musicplayer.nowplaying.NowPlaying;
-import com.example.musicplayer.ui.EditTags;
 import com.example.musicplayer.ui.folders.FoldersFragment;
 import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller;
 
@@ -58,7 +47,6 @@ public class FoldersAdapter extends SelectableAdapter<RecyclerView.ViewHolder> i
     private ArrayList<Songs> songs;
     private final ArrayList<Songs> songsInPath;
     private final Fragment fragment;
-    private Toast toast;
     private final SharedPreferences sort;
 
     private final int TYPE_PARENT = 0;
