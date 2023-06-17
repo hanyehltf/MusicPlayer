@@ -35,7 +35,6 @@
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
             android:focusableInTouchMode="true"
-            android:fontFamily="@font/space_mono"
             android:freezesText="true"
             android:gravity="center"
             android:singleLine="true"
@@ -51,7 +50,6 @@
             android:layout_marginTop="2dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="1dp"
-            android:fontFamily="@font/space_mono"
             android:gravity="center"
             android:singleLine="true"
             android:text="TextView"
@@ -59,13 +57,6 @@
             android:textSize="14sp" />
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/folders_popup_menu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|end"
-        android:layout_marginEnd="1dp"
-        android:padding="5dp"
-        app:srcCompat="@drawable/popup_menu" />
+
 
 </FrameLayout>

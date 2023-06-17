@@ -13,13 +13,7 @@
         android:layout_marginBottom="1dp"
         android:background="#000">
 
-        <ImageView
-            android:id="@+id/queue"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="start|center_vertical"
-            android:layout_marginStart="10dp"
-            app:srcCompat="@drawable/queue_white" />
+
 
         <TextView
             android:id="@+id/song_number"
@@ -29,7 +23,6 @@
             android:layout_marginStart="50dp"
             android:background="#FFF"
             android:fadingEdge="horizontal|vertical"
-            android:fontFamily="@font/eczar"
             android:gravity="center"
             android:singleLine="true"
             android:text="20/120"
@@ -48,7 +41,6 @@
             android:ellipsize="marquee"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:fontFamily="@font/space_mono"
             android:freezesText="true"
             android:marqueeRepeatLimit="@android:integer/config_shortAnimTime"
             android:scrollHorizontally="true"
@@ -64,21 +56,12 @@
             android:layout_marginStart="111dp"
             android:layout_marginTop="30dp"
             android:layout_marginEnd="40dp"
-            android:fontFamily="@font/space_mono"
             android:singleLine="true"
             android:text="TextView"
             android:textColor="@color/notification_artist"
             android:textSize="14sp" />
 
-        <ImageView
-            android:id="@+id/npq_popup_menu"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_gravity="center_vertical|end"
-            android:layout_marginEnd="10dp"
-            android:clickable="true"
-            android:focusable="true"
-            app:srcCompat="@drawable/popup_menu" />
+
 
 
     </FrameLayout>

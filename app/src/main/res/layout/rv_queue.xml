@@ -49,16 +49,7 @@
         android:textColor="@color/notification_artist"
         android:textSize="13sp" />
 
-    <ImageView
-        android:id="@+id/queue_song_popup_menu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|end"
-        android:layout_marginEnd="5dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:padding="5dp"
-        app:srcCompat="@drawable/popup_menu" />
+
 
     <TextView
         android:id="@+id/queue_song_duration"

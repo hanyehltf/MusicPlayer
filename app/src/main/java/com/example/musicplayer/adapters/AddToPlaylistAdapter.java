@@ -64,8 +64,7 @@ public class AddToPlaylistAdapter extends RecyclerView.Adapter<AddToPlaylistAdap
 
 
         private final TextView tv_playlist_name;
-        private final ImageView iv_playlist_art, iv_playlist_popup_menu;
-
+        private final ImageView iv_playlist_art;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -73,7 +72,6 @@ public class AddToPlaylistAdapter extends RecyclerView.Adapter<AddToPlaylistAdap
 
             tv_playlist_name = itemView.findViewById(R.id. tv_playlist_name);
             iv_playlist_art = itemView.findViewById(R.id.iv_playlist_art);
-            iv_playlist_popup_menu = itemView.findViewById(R.id.iv_playlist_popup_menu);
 
             itemView.setOnClickListener(this);
 
@@ -101,7 +99,6 @@ public class AddToPlaylistAdapter extends RecyclerView.Adapter<AddToPlaylistAdap
     @Override
     public void onBindViewHolder(@NonNull final AddToPlaylistAdapter.ViewHolder holder, int position) {
 
-        holder.iv_playlist_popup_menu.setVisibility(View.GONE);
         holder.tv_playlist_name.setText(playlists.get(position).getName());
         holder.tv_playlist_name.setSelected(true);
 

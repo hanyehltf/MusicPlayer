@@ -45,10 +45,7 @@ import com.example.musicplayer.adapters.SongChanged;
 import com.example.musicplayer.database.DataLoader;
 import com.example.musicplayer.database.Songs;
 import com.example.musicplayer.nowplaying.NowPlaying;
-import com.example.musicplayer.ui.SettingsActivity;
-import com.example.musicplayer.ui.equalizer.EqualizerActivity;
 import com.example.musicplayer.ui.folders.FoldersFragment;
-import com.example.musicplayer.ui.search.SearchActivity;
 import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller;
 
 import java.io.File;
@@ -305,15 +302,7 @@ public class SongsFragment extends Fragment implements ItemClicked, PlaylistItem
 
             switch (item.getTitle().toString()) {
 
-                case "Search":
-                    FoldersFragment.currentPath = "/";
-                    FoldersFragment.slashCount = 0;
-                    startActivity(new Intent(context, SearchActivity.class));
-                    break;
 
-                case "Equalizer":
-                    startActivity(new Intent(context, EqualizerActivity.class));
-                    break;
 
                 case "Play All":
                     DataLoader.playAudio(0,mySongs, storage, context);
@@ -328,9 +317,7 @@ public class SongsFragment extends Fragment implements ItemClicked, PlaylistItem
                     DataLoader.addToPlaylist(MediaPlayerService.audioList, context, SongsFragment.this);
                     break;
 
-                case "Settings":
-                    startActivity(new Intent(context, SettingsActivity.class));
-                    break;
+
 
                 case "Title":
                     menu.getItem(3).getSubMenu().getItem(sort.getInt("SongIndex", 0)).setChecked(false);
@@ -415,17 +402,7 @@ public class SongsFragment extends Fragment implements ItemClicked, PlaylistItem
     }
 
 
-    @Override
-    public void onPrepareOptionsMenu(@NonNull Menu menu) {
 
-        this.menu = menu;
-        menu.getItem(3).getSubMenu().removeItem(R.id.sort_num_songs);
-        menu.getItem(3).getSubMenu().removeItem(R.id.sort_track);
-        menu.getItem(3).getSubMenu().removeItem(R.id.sort_num_album);
-        menu.getItem(3).getSubMenu().getItem(sort.getInt("SongIndex",0)).setChecked(true);
-        if (sort.getBoolean("SongReverse", false)) menu.getItem(3).getSubMenu().getItem(6).setChecked(true);
-
-    }
 
     @Override
     public void onSongChanged() {
@@ -437,7 +414,6 @@ public class SongsFragment extends Fragment implements ItemClicked, PlaylistItem
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            mode.getMenuInflater().inflate (R.menu.selection_menu, menu);
             return true;
         }
 

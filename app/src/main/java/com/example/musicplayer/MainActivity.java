@@ -46,7 +46,6 @@ import com.example.musicplayer.adapters.SongChanged;
 import com.example.musicplayer.database.Songs;
 import com.example.musicplayer.nowplaying.NowPlaying;
 import com.example.musicplayer.ui.folders.FoldersFragment;
-import com.example.musicplayer.ui.search.SearchActivity;
 import com.example.musicplayer.ui.songs.SongsFragment;
 import com.google.android.material.navigation.NavigationView;
 
@@ -137,7 +136,6 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
 
                 Toolbar toolbar = findViewById(R.id.toolbar);
-                toolbar.setOverflowIcon(getResources().getDrawable(R.drawable.popup_menu_green));
                 toolbar.setNavigationIcon(R.drawable.nav_green);
                 setSupportActionBar(toolbar);
 
@@ -165,12 +163,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
 
-                // Passing each menu ID as a set of Ids because each
-                // menu should be considered as top level destinations.
                 navigationView = findViewById(R.id.nav_view);
 
                 mAppBarConfiguration = new AppBarConfiguration.Builder(
-                        R.id.nav_folders, R.id.nav_songs, R.id.nav_playlists, R.id.nav_artists, R.id.nav_albums)
+                        R.id.nav_folders, R.id.nav_songs, R.id.nav_playlists)
                         .setDrawerLayout(drawer)
                         .build();
 
@@ -190,13 +186,6 @@ public class MainActivity extends AppCompatActivity {
                             navGraph.setStartDestination(R.id.nav_songs);
                             break;
 
-                        case "Albums":
-                            navGraph.setStartDestination(R.id.nav_albums);
-                            break;
-
-                        case "Artists":
-                            navGraph.setStartDestination(R.id.nav_artists);
-                            break;
 
                         case "Folders":
                             navGraph.setStartDestination(R.id.nav_folders);
@@ -271,13 +260,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        menu.getItem(3).getSubMenu().clearHeader();
-        return true;
-    }
+
 
     @Override
     public boolean onSupportNavigateUp() {
@@ -306,23 +289,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        if (SearchActivity.openAlbumSongs) {
-            NavHostFragment.findNavController(getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)).navigate(R.id.action_global_albumSongsFragment2);
-            SearchActivity.openAlbumSongs = false;
-        }
-        else if (SearchActivity.openArtistAlbums){
-            NavHostFragment.findNavController(getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)).navigate(R.id.action_global_artist_albums_frag);
-            SearchActivity.openArtistAlbums = false;
-        }
+
 
 
         preferences = getSharedPreferences("PREFERENCES", MODE_PRIVATE);
 
         navigationView.getMenu().getItem(0).setVisible(preferences.getBoolean("SONGS", true));
-        navigationView.getMenu().getItem(1).setVisible(preferences.getBoolean("ALBUMS", true));
-        navigationView.getMenu().getItem(2).setVisible(preferences.getBoolean("ARTISTS", true));
-        navigationView.getMenu().getItem(3).setVisible(preferences.getBoolean("FOLDERS", true));
-        navigationView.getMenu().getItem(4).setVisible(preferences.getBoolean("PLAYLISTS", true));
+        navigationView.getMenu().getItem(1).setVisible(preferences.getBoolean("FOLDERS", true));
+        navigationView.getMenu().getItem(2).setVisible(preferences.getBoolean("PLAYLISTS", true));
 
     }
 

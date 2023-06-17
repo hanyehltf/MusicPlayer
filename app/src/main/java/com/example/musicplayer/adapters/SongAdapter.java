@@ -33,7 +33,6 @@ import com.example.musicplayer.database.DataLoader;
 import com.example.musicplayer.database.Songs;
 import com.example.musicplayer.nowplaying.NowPlaying;
 import com.example.musicplayer.ui.EditTags;
-import com.example.musicplayer.ui.albums.AlbumSongsFragment;
 import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller;
 
 import org.jetbrains.annotations.NotNull;
@@ -92,7 +91,7 @@ public class SongAdapter extends SelectableAdapter<SongAdapter.ViewHolder> imple
 
 
         private final TextView tv_song_name, tv_artist_name, tv_song_duration;
-        private final ImageView iv_album_art, iv_popup_menu;
+        private final ImageView iv_album_art;
 
 
         public ViewHolder(@NonNull View itemView) {
@@ -103,7 +102,7 @@ public class SongAdapter extends SelectableAdapter<SongAdapter.ViewHolder> imple
             tv_artist_name = itemView.findViewById(R.id.tv_artist_name);
             tv_song_duration = itemView.findViewById(R.id.tv_song_duration);
             iv_album_art = itemView.findViewById(R.id.iv_album_art);
-            iv_popup_menu = itemView.findViewById(R.id.iv_popup_menu);
+
 
            itemView.setOnClickListener(this);
            itemView.setOnLongClickListener(this);
@@ -176,103 +175,7 @@ public class SongAdapter extends SelectableAdapter<SongAdapter.ViewHolder> imple
         }.run();
 
 
-        if (!isSelected(position)) {
-            holder.iv_popup_menu.setClickable(true);
-            holder.iv_popup_menu.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
 
-                    PopupMenu menu = new PopupMenu(context, v);
-
-                    menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-
-                            switch (item.getTitle().toString()) {
-
-                                case "Play":
-                                    MainActivity.index = position;
-                                    ArrayList<Songs> playSong = new ArrayList<>();
-                                    playSong.add(songs.get(position));
-                                    DataLoader.playAudio(0, playSong, storage, context);
-                                    break;
-
-                                case "Enqueue":
-                                    MediaPlayerService.audioList.add(songs.get(position));
-                                    storage.storeAudio(MediaPlayerService.audioList);
-                                    Toast.makeText(context, "Song has been added to the queue!", Toast.LENGTH_SHORT).show();
-                                    break;
-
-                                case "Play next":
-                                    MediaPlayerService.audioList.add(MediaPlayerService.audioIndex + 1, songs.get(position));
-                                    storage.storeAudio(MediaPlayerService.audioList);
-                                    Toast.makeText(context, "Song has been added to the queue!", Toast.LENGTH_SHORT).show();
-                                    break;
-
-                                case "Shuffle":
-                                    DataLoader.playAudio(position, songs, storage, context);
-                                    NowPlaying.shuffle = true;
-                                    break;
-
-                                case "Add to playlist":
-                                    ArrayList<Songs> addSong = new ArrayList<>();
-                                    addSong.add(songs.get(position));
-                                    DataLoader.addToPlaylist(addSong, context, fragment);
-                                    break;
-
-                                case "Lyrics":
-                                    MainActivity.index = position;
-                                    Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-                                    intent.putExtra("query", songs.get(position).getTitle() + " " + songs.get(position).getArtist() + " lyrics");
-                                    context.startActivity(intent);
-                                    break;
-
-                                case "Edit tags":
-                                    MainActivity.index = position;
-                                    EditTags.song = songs.get(position);
-                                    fragment.startActivityForResult(new Intent(context, EditTags.class), 421);
-                                    break;
-
-                                case "Use as ringtone":
-
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                        if (!Settings.System.canWrite(context)) {
-
-                                            MainActivity.index = position;
-                                            Intent ringtoneIntent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                                            ((AppCompatActivity)context).startActivityForResult(ringtoneIntent, 69);
-
-                                        } else {
-                                            RingtoneManager.setActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE, ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, songs.get(position).getId()));
-                                            if (toast != null) toast.cancel();
-                                            toast = Toast.makeText(context, songs.get(position).getTitle() + " set as Ringtone!", Toast.LENGTH_LONG);
-                                            toast.show();
-                                        }
-                                    } else {
-                                        RingtoneManager.setActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE, ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, songs.get(position).getId()));
-                                        if (toast != null) toast.cancel();
-                                        toast = Toast.makeText(context, songs.get(position).getTitle() + " set as Ringtone!", Toast.LENGTH_LONG);
-                                        toast.show();
-                                    }
-                                    break;
-
-                                case "Delete":
-                                    deleteSongs(position);
-                                    break;
-
-                            }
-
-                            return true;
-                        }
-                    });
-
-                    menu.inflate(R.menu.song_popup_menu);
-                    menu.show();
-
-                }
-            });
-        }
-        else holder.iv_popup_menu.setClickable(false);
     }
 
 
@@ -289,7 +192,6 @@ public class SongAdapter extends SelectableAdapter<SongAdapter.ViewHolder> imple
         holder.iv_album_art.setImageDrawable(null);
         holder.tv_song_name.setText(null);
         holder.tv_artist_name.setText(null);
-        holder.iv_popup_menu.setOnClickListener(null);
 
         super.onViewRecycled(holder);
     }

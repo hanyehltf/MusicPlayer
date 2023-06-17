@@ -69,7 +69,6 @@
                 android:ellipsize="marquee"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                android:fontFamily="@font/space_mono"
                 android:freezesText="true"
                 android:marqueeRepeatLimit="@android:integer/config_shortAnimTime"
                 android:scrollHorizontally="true"

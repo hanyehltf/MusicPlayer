@@ -81,7 +81,7 @@ public class QueueAdapter extends SelectableAdapter<QueueAdapter.ViewHolder> {
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         private final TextView queue_song_title, queue_song_artist, queue_song_duration;
-        private final ImageView queue_drag, queue_song_popup_menu;
+        private final ImageView queue_drag;
         private final FrameLayout rv_queue;
 
         public ViewHolder(@NonNull View itemView) {
@@ -91,7 +91,6 @@ public class QueueAdapter extends SelectableAdapter<QueueAdapter.ViewHolder> {
             queue_song_title= itemView.findViewById(R.id.queue_song_title);
             queue_song_artist = itemView.findViewById(R.id.queue_song_artist);
             queue_song_duration = itemView.findViewById(R.id.queue_song_duration);
-            queue_song_popup_menu = itemView.findViewById(R.id.queue_song_popup_menu);
             rv_queue = itemView.findViewById(R.id.rv_queue);
 
             itemView.setOnClickListener(this);
@@ -154,7 +153,6 @@ public class QueueAdapter extends SelectableAdapter<QueueAdapter.ViewHolder> {
 
         if (isSelected(position)){
             holder.rv_queue.setBackground(context.getResources().getDrawable(R.drawable.selected));
-            holder.queue_song_popup_menu.setClickable(false);
             holder.queue_drag.setClickable(false);
         }
 
@@ -181,157 +179,8 @@ public class QueueAdapter extends SelectableAdapter<QueueAdapter.ViewHolder> {
                 }
             });
 
-            holder.queue_song_popup_menu.setClickable(true);
 
-            holder.queue_song_popup_menu.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
 
-                    PopupMenu menu = new PopupMenu(context, v);
-
-                    menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-
-                            switch (item.getTitle().toString()) {
-
-                                case "Play":
-                                    ArrayList<Songs> playSong = new ArrayList<>();
-                                    if (fragment == null) playSong.add(MediaPlayerService.audioList.get(position));
-                                    else playSong.add(songs.get(position));
-                                    DataLoader.playAudio(0, playSong, storage, context);
-                                    break;
-
-                                case "Enqueue":
-                                    if (fragment == null) {
-                                        MediaPlayerService.audioList.add(MediaPlayerService.audioList.get(position));
-                                        notifyDataSetChanged();
-                                    }
-                                    else MediaPlayerService.audioList.add(songs.get(position));
-                                    storage.storeAudio(MediaPlayerService.audioList);
-                                    Toast.makeText(context, "Song has been added to the queue!", Toast.LENGTH_SHORT).show();
-                                    break;
-
-                                case "Play next":
-                                    if (fragment == null) {
-                                        MediaPlayerService.audioList.add(MediaPlayerService.audioIndex + 1, MediaPlayerService.audioList.get(position));
-                                        notifyDataSetChanged();
-                                    }
-                                    else MediaPlayerService.audioList.add(MediaPlayerService.audioIndex + 1, songs.get(position));
-                                    storage.storeAudio(MediaPlayerService.audioList);
-                                    Toast.makeText(context, "Song has been added to the queue!", Toast.LENGTH_SHORT).show();
-                                    break;
-
-                                case "Shuffle":
-                                    if (fragment == null) {
-                                        DataLoader.playAudio(position, MediaPlayerService.audioList, storage, context);
-                                        MediaControllerCompat.getMediaController((AppCompatActivity) context).getTransportControls().setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_ALL);
-                                    }
-                                    else {
-                                        DataLoader.playAudio(position, (ArrayList<Songs>) songs, storage, context);
-                                        NowPlaying.shuffle = true;
-                                    }
-                                    break;
-
-                                case "Add to playlist":
-                                    if (fragment == null) {
-                                        if (MediaPlayerService.activeAudio.getId() != -100) {
-                                            ArrayList<Songs> addSong = new ArrayList<>();
-                                            addSong.add(MediaPlayerService.audioList.get(position));
-                                            DataLoader.addToPlaylist(addSong, context, null);
-                                        } else {
-                                            Toast.makeText(context, "Unable to perform task", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-                                    else {
-                                        ArrayList<Songs> addSong = new ArrayList<>();
-                                        addSong.add(songs.get(position));
-                                        DataLoader.addToPlaylist(addSong, context, fragment);
-                                    }
-                                    break;
-
-                                case "Lyrics":
-                                    if (fragment != null) MainActivity.index = position;
-                                    else NowPlaying.index= position;
-                                    Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-                                    if (fragment == null) intent.putExtra("query", songs.get(position).getTitle() + " " + MediaPlayerService.audioList.get(position).getArtist() + " lyrics");
-                                    else intent.putExtra("query", songs.get(position).getTitle() + " " + songs.get(position).getArtist() + " lyrics");
-                                    context.startActivity(intent);
-                                    break;
-
-                                case "Edit tags":
-
-                                    if (MediaPlayerService.activeAudio.getId() != -100) {
-
-                                        if (fragment != null) {
-                                            EditTags.song = songs.get(position);
-                                            MainActivity.index = position;
-                                            fragment.startActivityForResult(new Intent(context, EditTags.class), 423);
-                                        }
-                                        else {
-                                            EditTags.song = MediaPlayerService.audioList.get(position);
-                                            NowPlaying.index = position;
-                                            ((Activity) context).startActivityForResult(new Intent(context, EditTags.class), 423);
-                                        }
-                                    }else{
-                                        Toast.makeText(context, "Unable to perform task", Toast.LENGTH_SHORT).show();
-                                    }
-                                    break;
-
-                                case "Use as ringtone":
-
-                                    if (MediaPlayerService.activeAudio.getId() != -100) {
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                            if (!Settings.System.canWrite(context)) {
-
-                                                if (fragment != null) MainActivity.index = position;
-                                                else NowPlaying.index= position;
-                                                Intent ringtoneIntent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                                                ((AppCompatActivity) context).startActivityForResult(ringtoneIntent, 69);
-
-                                            } else {
-                                                if (toast != null) toast.cancel();
-                                                if (fragment == null) {
-                                                    RingtoneManager.setActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE, ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, MediaPlayerService.audioList.get(position).getId()));
-                                                    toast = Toast.makeText(context, MediaPlayerService.audioList.get(position).getTitle() + " set as Ringtone!", Toast.LENGTH_LONG);
-                                                }
-                                                else {
-                                                    RingtoneManager.setActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE, ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, songs.get(position).getId()));
-                                                    toast = Toast.makeText(context, songs.get(position).getTitle() + " set as Ringtone!", Toast.LENGTH_LONG);
-                                                }
-                                                toast.show();
-                                            }
-                                        } else {
-                                            RingtoneManager.setActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE, ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, songs.get(position).getId()));
-                                            if (toast != null) toast.cancel();
-                                            if (fragment == null)  toast = Toast.makeText(context, MediaPlayerService.audioList.get(position).getTitle() + " set as Ringtone!", Toast.LENGTH_LONG);
-                                            else toast = Toast.makeText(context, songs.get(position).getTitle() + " set as Ringtone!", Toast.LENGTH_LONG);
-                                            toast.show();
-                                        }
-                                    }else {
-                                        Toast.makeText(context, "Unable to perform task", Toast.LENGTH_SHORT).show();
-                                    }
-                                    break;
-
-                                case "Delete":
-                                    if (MediaPlayerService.activeAudio.getId() != -100) {
-                                        deleteSongs(position);
-                                    }else {
-                                        Toast.makeText(context, "Unable to perform task", Toast.LENGTH_SHORT).show();
-                                    }
-                                    break;
-
-                            }
-
-                            return true;
-                        }
-                    });
-
-                    menu.inflate(R.menu.song_popup_menu);
-                    menu.show();
-
-                }
-            });
 
         }
 
@@ -348,7 +197,6 @@ public class QueueAdapter extends SelectableAdapter<QueueAdapter.ViewHolder> {
 
     @Override
     public void onViewRecycled(@NonNull ViewHolder holder) {
-        holder.queue_song_popup_menu.setOnClickListener(null);
         super.onViewRecycled(holder);
     }
 

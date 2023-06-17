@@ -17,17 +17,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,15 +47,8 @@ import com.example.musicplayer.StorageUtil;
 import com.example.musicplayer.adapters.ItemClicked;
 import com.example.musicplayer.adapters.PlaylistItemClicked;
 import com.example.musicplayer.adapters.QueueAdapter;
-import com.example.musicplayer.database.Albums;
-import com.example.musicplayer.database.Artists;
-import com.example.musicplayer.database.DataLoader;
 import com.example.musicplayer.database.Songs;
-import com.example.musicplayer.ui.EditTags;
-import com.example.musicplayer.ui.albums.AlbumsFragment;
-import com.example.musicplayer.ui.artists.ArtistsFragment;
-import com.example.musicplayer.ui.equalizer.EqualizerActivity;
-import com.example.musicplayer.ui.search.SearchActivity;
+
 import com.example.musicplayer.ui.songs.SongsFragment;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
@@ -82,7 +72,7 @@ public class NowPlaying extends AppCompatActivity implements ItemClicked, Playli
     private RecyclerView recyclerView;
     private QueueAdapter queueAdapter;
     private  ItemTouchHelper itemTouchHelper;
-    AlbumArtViewPagerAdapter view_pager_adapter;
+
 
     private AudioManager audioManager;
 
@@ -98,7 +88,6 @@ public class NowPlaying extends AppCompatActivity implements ItemClicked, Playli
     private final Handler song_handler = new Handler();
 
     private ActionMode actionMode;
-    private final ActionModeCallback actionModeCallback = new ActionModeCallback();
 
     private MediaBrowserCompat mediaBrowser;
     private MediaControllerCompat mediaController;
@@ -165,7 +154,6 @@ public class NowPlaying extends AppCompatActivity implements ItemClicked, Playli
                 @Override
                 public void run() {
 
-                    view_pager_adapter.notifyItemMoved(fromPosition, toPosition);
                     button = true;
                     wasMoved = true;
                     queueAdapter.notifyItemMoved(fromPosition, toPosition);
@@ -191,7 +179,6 @@ public class NowPlaying extends AppCompatActivity implements ItemClicked, Playli
                     button = true;
                     MediaPlayerService.audioIndex--;
                 }
-                view_pager_adapter.notifyItemRemoved(position);
                 storage.storeAudio(MediaPlayerService.audioList);
 
                 totalSongNo = "/" + MediaPlayerService.audioList.size();
@@ -204,7 +191,6 @@ public class NowPlaying extends AppCompatActivity implements ItemClicked, Playli
                 toast.show();
                 queueAdapter.notifyItemChanged(position);
                 button = true;
-                view_pager_adapter.notifyItemChanged(position);
             }
 
         }
@@ -286,9 +272,7 @@ public class NowPlaying extends AppCompatActivity implements ItemClicked, Playli
             album_art_view_pager.setPageTransformer(new DepthPageTransformer());
         }
 
-        view_pager_adapter = new AlbumArtViewPagerAdapter(NowPlaying.this);
 
-        album_art_view_pager.setAdapter(view_pager_adapter);
         album_art_view_pager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(final int position) {
@@ -317,119 +301,8 @@ public class NowPlaying extends AppCompatActivity implements ItemClicked, Playli
         });
 
 
-        ImageView npq_popup_menu = findViewById(R.id.npq_popup_menu);
-
-        npq_popup_menu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                PopupMenu popupMenu = new PopupMenu(NowPlaying.this, v);
-
-                popupMenu.inflate(R.menu.npq_menu);
-
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
 
 
-                        switch (item.getTitle().toString()) {
-
-                            case "Go to album":
-                                if (MediaPlayerService.activeAudio.getId() != -100){
-                                    AlbumsFragment.album = loadAlbum(MediaPlayerService.activeAudio.getAlbumid());
-                                    Intent albumIntent = new Intent(NowPlaying.this, MainActivity.class);
-                                    albumIntent.setAction("Album");
-                                    startActivity(albumIntent);
-                                } else {
-                                    Toast.makeText(NowPlaying.this, "Unable to perform task", Toast.LENGTH_SHORT).show();
-                                }
-
-                                break;
-
-                            case "Go to artist":
-                                if (MediaPlayerService.activeAudio.getId() != -100){
-                                    ArtistsFragment.artist = loadArtist(MediaPlayerService.activeAudio.getArtistid());
-                                    Intent artistIntent = new Intent(NowPlaying.this, MainActivity.class);
-                                    artistIntent.setAction("Artist");
-                                    startActivity(artistIntent);
-                                }else {
-                                    Toast.makeText(NowPlaying.this, "Unable to perform task", Toast.LENGTH_SHORT).show();
-                                }
-
-                                break;
-
-                            case "Add to playlist":
-                                if (MediaPlayerService.activeAudio.getId() != -100) {
-                                    ArrayList<Songs> addSong = new ArrayList<>();
-                                    addSong.add(MediaPlayerService.audioList.get(MediaPlayerService.audioIndex));
-                                    DataLoader.addToPlaylist(addSong, NowPlaying.this, null);
-                                }
-                                else {
-                                    Toast.makeText(NowPlaying.this, "Unable to perform task", Toast.LENGTH_SHORT).show();
-                                }
-                                break;
-
-
-                            case "Lyrics":
-                                Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-                                intent.putExtra("query", MediaPlayerService.activeAudio.getTitle() + " " + MediaPlayerService.activeAudio.getArtist() + " lyrics");
-                                startActivity(intent);
-                                break;
-
-                            case "Edit tags":
-                                if (MediaPlayerService.activeAudio.getId() != -100) {
-                                    EditTags.song = MediaPlayerService.activeAudio;
-                                    startActivityForResult(new Intent(NowPlaying.this, EditTags.class), EDIT_TAGS_REQUEST_CODE);
-                                }
-                                else {
-                                    Toast.makeText(NowPlaying.this, "Unable to perform task", Toast.LENGTH_SHORT).show();
-                                }
-                                break;
-
-                            case "Use as ringtone":
-
-                                if (MediaPlayerService.activeAudio.getId() != -100){
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                        if (!Settings.System.canWrite(NowPlaying.this)) {
-
-                                            Intent ringtoneIntent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                                            startActivityForResult(ringtoneIntent, 69);
-
-                                        } else {
-                                            RingtoneManager.setActualDefaultRingtoneUri(NowPlaying.this, RingtoneManager.TYPE_RINGTONE, ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, MediaPlayerService.activeAudio.getId()));
-                                            if (toast != null) toast.cancel();
-                                            toast = Toast.makeText(NowPlaying.this, MediaPlayerService.activeAudio.getTitle() + " set as Ringtone!", Toast.LENGTH_LONG);
-                                            toast.show();
-                                        }
-                                    } else {
-                                        RingtoneManager.setActualDefaultRingtoneUri(NowPlaying.this, RingtoneManager.TYPE_RINGTONE, ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, MediaPlayerService.activeAudio.getId()));
-                                        if (toast != null) toast.cancel();
-                                        toast = Toast.makeText(NowPlaying.this, MediaPlayerService.activeAudio.getTitle() + " set as Ringtone!", Toast.LENGTH_LONG);
-                                        toast.show();
-                                    }
-                                }else  {
-                                    Toast.makeText(NowPlaying.this, "Unable to perform task", Toast.LENGTH_SHORT).show();
-                                }
-                                break;
-
-                            case "Delete":
-                                if (MediaPlayerService.activeAudio.getId() != -100){
-                                    queueAdapter.deleteSongs(MediaPlayerService.audioIndex);
-                                }else {
-                                    Toast.makeText(NowPlaying.this, "Unable to perform task", Toast.LENGTH_SHORT).show();
-                                }
-                                break;
-                        }
-
-                        return true;
-
-                    }
-                });
-
-                popupMenu.show();
-
-            }
-        });
 
     }
 
@@ -468,7 +341,6 @@ public class NowPlaying extends AppCompatActivity implements ItemClicked, Playli
 
     @Override
     public void onItemLongClicked(int index) {
-        if (actionMode == null) actionMode = startSupportActionMode(actionModeCallback);
         toggleSelection(index);
     }
 
@@ -1045,7 +917,6 @@ public class NowPlaying extends AppCompatActivity implements ItemClicked, Playli
         super.onResume();
 
         queueAdapter.notifyDataSetChanged();
-        view_pager_adapter.notifyDataSetChanged();
     }
 
     public static String getTimeInMins (int time){
@@ -1088,83 +959,6 @@ public class NowPlaying extends AppCompatActivity implements ItemClicked, Playli
     };
 
 
-    private class ActionModeCallback implements ActionMode.Callback {
-
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            mode.getMenuInflater().inflate (R.menu.selection_menu, menu);
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-
-            ArrayList<Integer> indices = (ArrayList<Integer>) queueAdapter.getSelectedItems();
-            ArrayList<Songs> songs = new ArrayList<>();
-
-            for (int i=0; i<indices.size(); i++){
-                songs.add(MediaPlayerService.audioList.get(indices.get(i)));
-            }
-
-            switch (item.getTitle().toString()) {
-
-                case "Play":
-                    DataLoader.playAudio(0, songs, storage, NowPlaying.this);
-                    button = true;
-                    mode.finish();
-                    return true;
-
-                case "Enqueue":
-                    if (MediaPlayerService.audioList != null) MediaPlayerService.audioList.addAll(songs);
-                    else MediaPlayerService.audioList = songs;
-                    storage.storeAudio(MediaPlayerService.audioList);
-                    queueAdapter.notifyDataSetChanged();
-                    mode.finish();
-                    return true;
-
-                case "Play next":
-                    if (MediaPlayerService.audioList != null) MediaPlayerService.audioList.addAll(MediaPlayerService.audioIndex+1, songs);
-                    else MediaPlayerService.audioList = songs;
-                    storage.storeAudio(MediaPlayerService.audioList);
-                    queueAdapter.notifyDataSetChanged();
-                    mode.finish();
-                    return true;
-
-                case "Shuffle":
-                    DataLoader.playAudio(0, songs, storage, NowPlaying.this);
-                    button = true;
-                    MediaControllerCompat.getMediaController(NowPlaying.this).getTransportControls().setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_ALL);
-                    mode.finish();
-                    return true;
-
-                case "Add to playlist":
-                    DataLoader.addToPlaylist(songs, NowPlaying.this, null);
-                    mode.finish();
-                    return true;
-
-                case "Delete":
-                    SongsFragment.deleteSongs(songs, NowPlaying.this);
-                    queueAdapter.notifyDataSetChanged();
-                    mode.finish();
-                    return true;
-
-
-                default:
-                    return false;
-            }
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            queueAdapter.clearSelection();
-            actionMode = null;
-        }
-    }
 
 
     private void toggleSelection(int position) {
@@ -1185,79 +979,10 @@ public class NowPlaying extends AppCompatActivity implements ItemClicked, Playli
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        switch (item.getTitle().toString()){
-
-            case "Search":
-                button = true;
-                startActivity(new Intent(this, SearchActivity.class));
-                return true;
-
-            case "Equalizer":
-                button = true;
-                startActivity(new Intent(this, EqualizerActivity.class));
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-
-    }
 
 
-    private Albums loadAlbum(long album_id){
-
-        ContentResolver contentResolver = getApplication().getContentResolver();
-        Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
-        String selection = "_id =? ";
-        Cursor cursor = contentResolver.query(uri, new String[]{"_id","album","album_art", "numsongs", "artist"}, selection, new String[]{"" + album_id}, null);
-
-        if (cursor != null && cursor.getCount()>0) {
-
-            cursor.moveToFirst();
-
-            long id = cursor.getLong(0);
-            String album = cursor.getString(1).trim();
-            String albumArt = cursor.getString(2);
-            int numSongs = cursor.getInt(3);
-            String artist = cursor.getString(4).trim();
-
-            cursor.close();
-
-            return new Albums(id, album, albumArt, numSongs, artist);
-
-        }
-
-        return null;
-
-    }
-
-    private Artists loadArtist(long artist_id){
-
-        ContentResolver contentResolver = getApplication().getContentResolver();
-        Uri uri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
-        String selection = "_id =? ";
-        Cursor cursor = contentResolver.query(uri, new String[]{"_id", "artist"}, selection, new String[]{"" + artist_id}, null);
-
-        if (cursor != null && cursor.getCount()>0) {
-
-            cursor.moveToFirst();
-
-            long id = cursor.getLong(0);
-            String artist = cursor.getString(1).trim();
 
 
-            cursor.close();
-
-            return new Artists(id, artist);
-
-        }
-
-        return null;
-
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -1340,7 +1065,6 @@ public class NowPlaying extends AppCompatActivity implements ItemClicked, Playli
         recyclerView = null;
         queueAdapter = null;
         itemTouchHelper = null;
-        view_pager_adapter = null;
         audioManager = null;
         now_playing_shuffle = now_playing_previous = now_playing_pause = now_playing_next = now_playing_repeat = null;
         song_title = song_artist_album = song_number = now_playing_current_position = now_playing_duration = speed_0_25x = speed_0_50x = speed_0_75x = speed_1 = speed_1_25x = speed_1_50x = speed_1_75x = speed_2 = null;

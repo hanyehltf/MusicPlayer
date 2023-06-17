@@ -12,19 +12,6 @@
             android:checkable="true"
             android:onClick="onSongClicked" />
 
-        <item
-            android:id="@+id/nav_albums"
-            android:icon="@drawable/album_green"
-            android:title="@string/menu_albums"
-            android:checkable="true"
-            android:onClick="onAlbumClicked" />
-
-        <item
-            android:id="@+id/nav_artists"
-            android:icon="@drawable/artist_green"
-            android:title="@string/menu_artists"
-            android:checkable="true"
-            android:onClick="onArtistClicked"  />
 
         <item
             android:id="@+id/nav_folders"

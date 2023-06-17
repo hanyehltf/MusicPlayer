@@ -43,10 +43,7 @@ import com.example.musicplayer.adapters.SongChanged;
 import com.example.musicplayer.database.DataLoader;
 import com.example.musicplayer.database.Songs;
 import com.example.musicplayer.nowplaying.NowPlaying;
-import com.example.musicplayer.ui.SettingsActivity;
-import com.example.musicplayer.ui.equalizer.EqualizerActivity;
 import com.example.musicplayer.ui.folders.FoldersFragment;
-import com.example.musicplayer.ui.search.SearchActivity;
 import com.example.musicplayer.ui.songs.SongsFragment;
 import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller;
 
@@ -453,15 +450,7 @@ public class PlaylistSongsFragment extends Fragment  implements ItemClicked, Pla
 
             switch (item.getTitle().toString()) {
 
-                case "Search":
-                    FoldersFragment.currentPath = "/";
-                    FoldersFragment.slashCount = 0;
-                    startActivity(new Intent(context, SearchActivity.class));
-                    break;
 
-                case "Equalizer":
-                    startActivity(new Intent(context, EqualizerActivity.class));
-                    break;
 
                 case "Play All":
                     DataLoader.playAudio(0, playlistSongs, storage, context);
@@ -476,9 +465,7 @@ public class PlaylistSongsFragment extends Fragment  implements ItemClicked, Pla
                     DataLoader.addToPlaylist(MediaPlayerService.audioList, context, PlaylistSongsFragment.this);
                     break;
 
-                case "Settings":
-                    startActivity(new Intent(context, SettingsActivity.class));
-                    break;
+
 
 
                 default:
@@ -495,7 +482,6 @@ public class PlaylistSongsFragment extends Fragment  implements ItemClicked, Pla
     @Override
     public void onPrepareOptionsMenu(@NonNull Menu menu) {
 
-        menu.removeItem(R.id.action_sort);
 
     }
 
@@ -508,7 +494,6 @@ public class PlaylistSongsFragment extends Fragment  implements ItemClicked, Pla
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            mode.getMenuInflater().inflate (R.menu.selection_menu, menu);
             return true;
         }
 

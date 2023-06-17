@@ -102,8 +102,6 @@ public class FoldersAdapter extends SelectableAdapter<RecyclerView.ViewHolder> i
 
             tv_num_songs = itemView.findViewById(R.id.tv_num_songs);
             tv_num_songs.setVisibility(View.GONE);
-            folders_popup_menu = itemView.findViewById(R.id.folders_popup_menu);
-            folders_popup_menu.setVisibility(View.GONE);
 
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
@@ -131,7 +129,6 @@ public class FoldersAdapter extends SelectableAdapter<RecyclerView.ViewHolder> i
 
 
         private final TextView tv_folder_name, tv_num_songs;
-        private final ImageView folders_popup_menu;
 
 
         public FoldersViewHolder(@NonNull View itemView) {
@@ -140,7 +137,6 @@ public class FoldersAdapter extends SelectableAdapter<RecyclerView.ViewHolder> i
 
             tv_folder_name = itemView.findViewById(R.id.tv_folder_name);
             tv_num_songs = itemView.findViewById(R.id.tv_num_songs);
-            folders_popup_menu = itemView.findViewById(R.id.folders_popup_menu);
 
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
@@ -167,7 +163,7 @@ public class FoldersAdapter extends SelectableAdapter<RecyclerView.ViewHolder> i
 
 
         private final TextView tv_song_name, tv_artist_name, tv_song_duration;
-        private final ImageView iv_album_art, iv_popup_menu;
+        private final ImageView iv_album_art;
 
 
         public SongsViewHolder(@NonNull View itemView) {
@@ -178,7 +174,6 @@ public class FoldersAdapter extends SelectableAdapter<RecyclerView.ViewHolder> i
             tv_artist_name = itemView.findViewById(R.id.tv_artist_name);
             tv_song_duration = itemView.findViewById(R.id.tv_song_duration);
             iv_album_art = itemView.findViewById(R.id.iv_album_art);
-            iv_popup_menu = itemView.findViewById(R.id.iv_popup_menu);
 
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
@@ -247,70 +242,10 @@ public class FoldersAdapter extends SelectableAdapter<RecyclerView.ViewHolder> i
 
                 if (isSelected(position)) {
                     holder0.itemView.setBackground(context.getResources().getDrawable(R.drawable.selected));
-                    holder0.folders_popup_menu.setClickable(false);
                 }
                 else {
                     holder0.itemView.setBackground(context.getResources().getDrawable(R.drawable.not_selected));
-                    holder0.folders_popup_menu.setClickable(true);
 
-                    holder0.folders_popup_menu.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            PopupMenu menu = new PopupMenu(context, v);
-
-                            menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                                @Override
-                                public boolean onMenuItemClick(MenuItem item) {
-
-                                    songs = loadFolderAudio(FoldersFragment.currentPath + folders2.get(position - 1) + "/");
-
-                                    switch (item.getTitle().toString()) {
-
-                                        case "Play":
-                                            MainActivity.index = position;
-                                            DataLoader.playAudio(0, songs, storage, context);
-                                            break;
-
-                                        case "Enqueue":
-                                            MediaPlayerService.audioList.addAll(songs);
-                                            storage.storeAudio(MediaPlayerService.audioList);
-                                            if (songs.size()>1) Toast.makeText(context, songs.size() + " songs have been added to the queue!", Toast.LENGTH_SHORT).show();
-                                            else Toast.makeText(context, "1 song has been added to the queue!", Toast.LENGTH_SHORT).show();
-                                            break;
-
-                                        case "Play next":
-                                            MediaPlayerService.audioList.addAll(MediaPlayerService.audioIndex + 1, songs);
-                                            storage.storeAudio(MediaPlayerService.audioList);
-                                            if (songs.size()>1) Toast.makeText(context, songs.size() + " songs have been added to the queue!", Toast.LENGTH_SHORT).show();
-                                            else Toast.makeText(context, "1 song has been added to the queue!", Toast.LENGTH_SHORT).show();
-                                            break;
-
-                                        case "Shuffle":
-                                            MainActivity.index = position;
-                                            DataLoader.playAudio(position-1, songs, storage,context);
-                                            NowPlaying.shuffle = true;
-                                            break;
-
-                                        case "Add to playlist":
-                                            DataLoader.addToPlaylist(songs, context, fragment);
-                                            break;
-
-                                        case "Delete":
-                                            deleteFolderSongs();
-                                            break;
-
-                                    }
-
-                                    return true;
-                                }
-                            });
-
-                            menu.inflate(R.menu.folder_popup_menu);
-                            menu.show();
-
-                        }
-                    });
                 }
 
             } else {
@@ -332,68 +267,10 @@ public class FoldersAdapter extends SelectableAdapter<RecyclerView.ViewHolder> i
 
                 if (isSelected(position)){
                     holder0.itemView.setBackground(context.getResources().getDrawable(R.drawable.selected));
-                    holder0.folders_popup_menu.setClickable(false);
                 }
                 else {
                     holder0.itemView.setBackground(context.getResources().getDrawable(R.drawable.not_selected));
-                    holder0.folders_popup_menu.setClickable(true);
 
-                    holder0.folders_popup_menu.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            PopupMenu menu = new PopupMenu(context, v);
-
-                            menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                                @Override
-                                public boolean onMenuItemClick(MenuItem item) {
-
-                                    songs = loadFolderAudio(FoldersFragment.currentPath + folders2.get(position) + "/");
-
-                                    switch (item.getTitle().toString()) {
-
-                                        case "Play":
-                                            DataLoader.playAudio(0, songs,storage,context);
-                                            break;
-
-                                        case "Enqueue":
-                                            MediaPlayerService.audioList.addAll(songs);
-                                            storage.storeAudio(MediaPlayerService.audioList);
-                                            if (songs.size()>1) Toast.makeText(context, songs.size() + " songs have been added to the queue!", Toast.LENGTH_SHORT).show();
-                                            else Toast.makeText(context, "1 song has been added to the queue!", Toast.LENGTH_SHORT).show();
-                                            break;
-
-                                        case "Play next":
-                                            MediaPlayerService.audioList.addAll(MediaPlayerService.audioIndex + 1, songs);
-                                            storage.storeAudio(MediaPlayerService.audioList);
-                                            if (songs.size()>1) Toast.makeText(context, songs.size() + " songs have been added to the queue!", Toast.LENGTH_SHORT).show();
-                                            else Toast.makeText(context, "1 song has been added to the queue!", Toast.LENGTH_SHORT).show();
-                                            break;
-
-                                        case "Shuffle":
-                                            DataLoader.playAudio(position, songs, storage, context);
-                                            NowPlaying.shuffle = true;
-                                            break;
-
-                                        case "Add to playlist":
-                                            DataLoader.addToPlaylist(songs, context, fragment);
-                                            break;
-
-                                        case "Delete":
-                                            deleteFolderSongs();
-                                            break;
-
-                                    }
-
-                                    return true;
-                                }
-                            });
-
-                            menu.inflate(R.menu.folder_popup_menu);
-                            menu.show();
-
-                        }
-                    });
 
                 }
             }
@@ -428,104 +305,10 @@ public class FoldersAdapter extends SelectableAdapter<RecyclerView.ViewHolder> i
 
             if (isSelected(position)){
                 holder1.itemView.setBackground(context.getResources().getDrawable(R.drawable.selected));
-                holder1.iv_popup_menu.setClickable(false);
             }
             else {
                 holder1.itemView.setBackground(context.getResources().getDrawable(R.drawable.not_selected));
-                holder1.iv_popup_menu.setClickable(true);
 
-                holder1.iv_popup_menu.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        android.widget.PopupMenu menu = new android.widget.PopupMenu(context, v);
-
-                        menu.setOnMenuItemClickListener(new android.widget.PopupMenu.OnMenuItemClickListener() {
-                            @Override
-                            public boolean onMenuItemClick(MenuItem item) {
-
-                                switch (item.getTitle().toString()) {
-
-                                    case "Play":
-                                        ArrayList<Songs> playSong = new ArrayList<>();
-                                        playSong.add(songsInPath.get(position - folders2.size() - 1));
-                                        DataLoader.playAudio(0, playSong, storage, context);
-                                        break;
-
-                                    case "Enqueue":
-                                        MediaPlayerService.audioList.add(songsInPath.get(position - folders2.size() - 1));
-                                        storage.storeAudio(MediaPlayerService.audioList);
-                                        Toast.makeText(context, "Song has been added to the queue!", Toast.LENGTH_SHORT).show();
-                                        break;
-
-                                    case "Play next":
-                                        MediaPlayerService.audioList.add(MediaPlayerService.audioIndex + 1, songsInPath.get(position - folders2.size() - 1));
-                                        storage.storeAudio(MediaPlayerService.audioList);
-                                        Toast.makeText(context, "Song has been added to the queue!", Toast.LENGTH_SHORT).show();
-                                        break;
-
-                                    case "Shuffle":
-                                        DataLoader.playAudio(position - folders2.size() - 1, songsInPath, storage, context);
-                                        NowPlaying.shuffle = true;
-                                        break;
-
-                                    case "Add to playlist":
-                                        ArrayList<Songs> addSong = new ArrayList<>();
-                                        addSong.add(songsInPath.get(position - folders2.size() - 1));
-                                        DataLoader.addToPlaylist(addSong, context, fragment);
-                                        break;
-
-                                    case "Lyrics":
-                                        MainActivity.index = position;
-                                        Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-                                        intent.putExtra("query", songsInPath.get(position - folders2.size() - 1).getTitle() + " " + songsInPath.get(position).getArtist() + " lyrics");
-                                        context.startActivity(intent);
-                                        break;
-
-                                    case "Edit tags":
-                                        MainActivity.index = position;
-                                        EditTags.song = songsInPath.get(position - folders2.size() - 1);
-                                        fragment.startActivityForResult(new Intent(context, EditTags.class), 422);
-                                        break;
-
-                                    case "Use as ringtone":
-
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                            if (!Settings.System.canWrite(context)) {
-
-                                                MainActivity.index = position;
-                                                Intent ringtoneIntent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                                                ((AppCompatActivity)context).startActivityForResult(ringtoneIntent, 69);
-
-                                            } else {
-                                                RingtoneManager.setActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE, ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, songsInPath.get(position).getId()));
-                                                if (toast != null) toast = null;
-                                                toast = Toast.makeText(context, songsInPath.get(position - folders2.size() - 1).getTitle() + " set as Ringtone!", Toast.LENGTH_LONG);
-                                                toast.show();
-                                            }
-                                        } else {
-                                            RingtoneManager.setActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE, ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, songsInPath.get(position).getId()));
-                                            if (toast != null) toast = null;
-                                            toast = Toast.makeText(context, songsInPath.get(position - folders2.size() - 1).getTitle() + " set as Ringtone!", Toast.LENGTH_LONG);
-                                            toast.show();
-                                        }
-                                        break;
-
-                                    case "Delete":
-                                        deleteSongs(position - folders2.size() - 1);
-                                        break;
-
-                                }
-
-                                return true;
-                            }
-                        });
-
-                        menu.inflate(R.menu.song_popup_menu);
-                        menu.show();
-
-                    }
-                });
 
             }
 
@@ -559,11 +342,9 @@ public class FoldersAdapter extends SelectableAdapter<RecyclerView.ViewHolder> i
             SongsViewHolder holder1 = (SongsViewHolder) holder;
             Glide.with(holder1.iv_album_art).clear(holder1.iv_album_art);
             holder1.iv_album_art.setImageDrawable(null);
-            holder1.iv_popup_menu.setOnClickListener(null);
         }
         else if (holder.getItemViewType() == TYPE_FOLDER){
             FoldersViewHolder holder1 = (FoldersViewHolder) holder;
-            holder1.folders_popup_menu.setOnClickListener(null);
         }
 
         super.onViewRecycled(holder);

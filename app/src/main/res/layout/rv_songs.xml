@@ -51,14 +51,7 @@
             android:textSize="12sp" />
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/iv_popup_menu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|end"
-        android:layout_marginEnd="5dp"
-        android:padding="5dp"
-        app:srcCompat="@drawable/popup_menu" />
+
 
     <TextView
         android:id="@+id/tv_song_duration"

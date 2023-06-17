@@ -8,29 +8,23 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.musicplayer.MainActivity;
-import com.example.musicplayer.MediaPlayerService;
 import com.example.musicplayer.R;
 import com.example.musicplayer.StorageUtil;
-import com.example.musicplayer.database.DataLoader;
+
 import com.example.musicplayer.database.Playlists;
 import com.example.musicplayer.database.Songs;
-import com.example.musicplayer.nowplaying.NowPlaying;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +55,7 @@ public class PlaylistsAdapter extends SelectableAdapter<PlaylistsAdapter.ViewHol
 
 
         private final TextView tv_playlist_name;
-        private final ImageView iv_playlist_art, iv_playlist_popup_menu;
+        private final ImageView iv_playlist_art;
         private final FrameLayout playlist_selected;
 
 
@@ -71,7 +65,6 @@ public class PlaylistsAdapter extends SelectableAdapter<PlaylistsAdapter.ViewHol
 
             tv_playlist_name = itemView.findViewById(R.id. tv_playlist_name);
             iv_playlist_art = itemView.findViewById(R.id.iv_playlist_art);
-            iv_playlist_popup_menu = itemView.findViewById(R.id.iv_playlist_popup_menu);
             playlist_selected = itemView.findViewById(R.id.playlist_selected);
 
             itemView.setOnClickListener(this);
@@ -120,68 +113,10 @@ public class PlaylistsAdapter extends SelectableAdapter<PlaylistsAdapter.ViewHol
 
         if (isSelected(position)){
             holder.playlist_selected.setBackground(context.getResources().getDrawable(R.drawable.selected));
-            holder.iv_playlist_popup_menu.setClickable(false);
         }
         else {
             holder.playlist_selected.setBackground(context.getResources().getDrawable(R.drawable.not_selected));
-            holder.iv_playlist_popup_menu.setClickable(true);
 
-            holder.iv_playlist_popup_menu.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    PopupMenu menu = new PopupMenu(context, v);
-
-                    menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-
-                            songs = DataLoader.loadAudio(playlists.get(position).getId(), 3, context, null);
-
-                            switch (item.getTitle().toString()) {
-
-                                case "Play":
-                                    DataLoader.playAudio(0, songs, storage, context);
-                                    break;
-
-                                case "Enqueue":
-                                    MediaPlayerService.audioList.addAll(songs);
-                                    storage.storeAudio(MediaPlayerService.audioList);
-                                    if (songs.size()>1) Toast.makeText(context, songs.size() + " songs have been added to the queue!", Toast.LENGTH_SHORT).show();
-                                    else Toast.makeText(context, "1 song has been added to the queue!", Toast.LENGTH_SHORT).show();
-                                    break;
-
-                                case "Play next":
-                                    MediaPlayerService.audioList.addAll(MediaPlayerService.audioIndex + 1, songs);
-                                    storage.storeAudio(MediaPlayerService.audioList);
-                                    if (songs.size()>1) Toast.makeText(context, songs.size() + " songs have been added to the queue!", Toast.LENGTH_SHORT).show();
-                                    else Toast.makeText(context, "1 song has been added to the queue!", Toast.LENGTH_SHORT).show();
-                                    break;
-
-                                case "Shuffle":
-                                    DataLoader.playAudio(position, songs, storage, context);
-                                    NowPlaying.shuffle = true;
-                                    break;
-
-                                case "Add to playlist":
-                                    DataLoader.addToPlaylist(songs, context, fragment);
-                                    break;
-
-                                case "Delete":
-                                    deletePlaylist(position);
-                                    break;
-
-                            }
-
-                            return true;
-                        }
-                    });
-
-                    menu.inflate(R.menu.folder_popup_menu);
-                    menu.show();
-
-                }
-            });
         }
 
     }

@@ -36,7 +36,6 @@ import androidx.media.session.MediaButtonReceiver;
 
 import com.example.musicplayer.database.Songs;
 import com.example.musicplayer.nowplaying.NowPlaying;
-import com.example.musicplayer.ui.equalizer.EqualizerActivity;
 import com.example.musicplayer.ui.songs.SongsFragment;
 
 import java.io.IOException;
@@ -333,9 +332,6 @@ public class MediaPlayerService extends MediaBrowserServiceCompat implements Med
             }
         }
 
-        if (EqualizerActivity.virtualizer != null) EqualizerActivity.virtualizer.release();
-        if (EqualizerActivity.bassBoost != null) EqualizerActivity.bassBoost.release();
-        if (EqualizerActivity.equalizer != null) EqualizerActivity.equalizer.release();
 
         if (mediaSession.isActive()) mediaSession.setActive(false);
         mediaSession.release();
@@ -844,9 +840,7 @@ public class MediaPlayerService extends MediaBrowserServiceCompat implements Med
             MainActivity.serviceBound = false;
             SharedPreferences equalizer = getSharedPreferences("EQUALIZER", MODE_PRIVATE);
             equalizer.edit().clear().apply();
-            if (EqualizerActivity.virtualizer != null) EqualizerActivity.virtualizer.release();
-            if (EqualizerActivity.bassBoost != null) EqualizerActivity.bassBoost.release();
-            if (EqualizerActivity.equalizer != null) EqualizerActivity.equalizer.release();
+
             stopMedia();
             stopSelf();
         }

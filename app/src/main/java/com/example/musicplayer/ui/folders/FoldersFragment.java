@@ -45,9 +45,6 @@ import com.example.musicplayer.adapters.SongChanged;
 import com.example.musicplayer.database.DataLoader;
 import com.example.musicplayer.database.Songs;
 import com.example.musicplayer.nowplaying.NowPlaying;
-import com.example.musicplayer.ui.SettingsActivity;
-import com.example.musicplayer.ui.equalizer.EqualizerActivity;
-import com.example.musicplayer.ui.search.SearchActivity;
 import com.example.musicplayer.ui.songs.SongsFragment;
 import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller;
 
@@ -490,128 +487,10 @@ public class FoldersFragment extends Fragment implements ItemClicked, FolderItem
 
 
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        try {
 
 
-            switch (item.getTitle().toString()) {
-
-                case "Search":
-                    startActivity(new Intent(context, SearchActivity.class));
-                    break;
-
-                case "Equalizer":
-                    startActivity(new Intent(context, EqualizerActivity.class));
-                    break;
-
-                case "Play All":
-                    ArrayList<Songs> songs = myAdapter.loadFolderAudio(currentPath);
-                    DataLoader.playAudio(0, songs, storage, context);
-                    break;
-
-                case "Shuffle All":
-                    ArrayList<Songs> shuffleSongs = myAdapter.loadFolderAudio(currentPath);
-                    DataLoader.playAudio(new Random().nextInt(shuffleSongs.size()), shuffleSongs, storage, context);
-                    NowPlaying.shuffle = true;
-                    break;
-
-                case "Save Now Playing":
-                    DataLoader.addToPlaylist(MediaPlayerService.audioList, context, FoldersFragment.this);
-                    break;
-
-                case "Settings":
-                    startActivity(new Intent(context, SettingsActivity.class));
-                    break;
-
-                case "Title":
-                    menu.getItem(3).getSubMenu().getItem(sort.getInt("FolderIndex", 0)).setChecked(false);
-                    if (!item.isChecked()) {
-                        item.setChecked(true);
-                        sort.edit().putInt("FolderIndex",0).putString("FolderSortOrder", MediaStore.Audio.Media.DEFAULT_SORT_ORDER).apply();
-                        loading();
-                    }
-                    break;
-
-                case "Album":
-                    menu.getItem(3).getSubMenu().getItem(sort.getInt("FolderIndex", 0)).setChecked(false);
-                    if (!item.isChecked()) {
-                        item.setChecked(true);
-                        sort.edit().putInt("FolderIndex",1).putString("FolderSortOrder", "album").apply();
-                        loading();
-                    }
-                    break;
-
-                case "Artist":
-                    menu.getItem(3).getSubMenu().getItem(sort.getInt("FolderIndex", 0)).setChecked(false);
-                    if (!item.isChecked()) {
-                        item.setChecked(true);
-                        sort.edit().putInt("FolderIndex",2).putString("FolderSortOrder", "artist").apply();
-                        loading();
-                    }
-                    break;
-
-                case "Duration":
-                    menu.getItem(3).getSubMenu().getItem(sort.getInt("FolderIndex", 0)).setChecked(false);
-                    if (!item.isChecked()) {
-                        item.setChecked(true);
-                        sort.edit().putInt("FolderIndex",3).putString("FolderSortOrder", "duration").apply();
-                        loading();
-                    }
-                    break;
-
-                case "Year":
-                    menu.getItem(3).getSubMenu().getItem(sort.getInt("FolderIndex", 0)).setChecked(false);
-                    if (!item.isChecked()) {
-                        item.setChecked(true);
-                        sort.edit().putInt("FolderIndex",4).putString("FolderSortOrder", "year").apply();
-                        loading();
-                    }
-                    break;
-
-                case "Date added":
-                    menu.getItem(3).getSubMenu().getItem(sort.getInt("FolderIndex", 0)).setChecked(false);
-                    if (!item.isChecked()) {
-                        item.setChecked(true);
-                        sort.edit().putInt("FolderIndex",5).putString("FolderSortOrder", "date_added").apply();
-                        loading();
-                    }
-                    break;
-
-                case "Reverse order":
-                    if (!item.isChecked()) {
-                        item.setChecked(true);
-                        sort.edit().putBoolean("FolderReverse", true).apply();
-                    }
-                    else {
-                        item.setChecked(false);
-                        sort.edit().putBoolean("FolderReverse", false).apply();
-                    }
-                    loading();
-                    break;
-
-                default:
-                    return super.onOptionsItemSelected(item);
-            }
-        } catch (Exception e) {
-            return super.onOptionsItemSelected(item);
-        }
-
-        return true;
-    }
 
 
-    @Override
-    public void onPrepareOptionsMenu(@NonNull Menu menu) {
-
-        this.menu = menu;
-        menu.getItem(3).getSubMenu().removeItem(R.id.sort_num_songs);
-        menu.getItem(3).getSubMenu().removeItem(R.id.sort_track);
-        menu.getItem(3).getSubMenu().removeItem(R.id.sort_num_album);
-        menu.getItem(3).getSubMenu().getItem(sort.getInt("FolderIndex",0)).setChecked(true);
-        if (sort.getBoolean("FolderReverse", false)) menu.getItem(3).getSubMenu().getItem(6).setChecked(true);
-
-    }
 
     @Override
     public void onSongChanged() {
@@ -622,7 +501,6 @@ public class FoldersFragment extends Fragment implements ItemClicked, FolderItem
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            mode.getMenuInflater().inflate (R.menu.selection_menu, menu);
             return true;
         }
 

@@ -2,10 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/action_search"
-        android:title="Search"
-        app:showAsAction="always"
-        android:icon="@drawable/search_green"/>
+
 
     <item android:id="@+id/action_play_all"
         android:title="Play All"
